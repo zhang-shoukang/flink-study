@@ -18,13 +18,8 @@ public class Test {
                         // group by the tuple field "0" and sum up tuple field "1"
                         .groupBy(0)
                         .sum(1);
-
         counts.writeAsCsv("/root/res.csv", "\n", " ");
-
-
-
     }
-
 }
 
 // User-defined functions
