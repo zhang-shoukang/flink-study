@@ -1,41 +1,30 @@
 package org.myorg.quickstart;
 
+import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.operators.AggregateOperator;
 import org.apache.flink.api.java.operators.DataSource;
+import org.apache.flink.util.Collector;
+import scala.Tuple2;
 
 public class Test {
     public static void main(String[] args) throws Exception {
         ExecutionEnvironment executionEnvironment = ExecutionEnvironment.getExecutionEnvironment();
-        DataSource<Tup> tupDataSource = executionEnvironment.fromElements(new Tup(1, 10), new Tup(1, 10), new Tup(2, 20), new Tup(2, 20));
-        AggregateOperator<Tup> sum = tupDataSource.sum(0);
+        DataSource<String> stringDataSource = executionEnvironment.readTextFile("/word.txt");
+        AggregateOperator<Tuple2<String, Integer>> sum = stringDataSource.flatMap(new FlatMapFunction<String, Tuple2<String, Integer>>() {
+            @Override
+            public void flatMap(String s, Collector<Tuple2<String, Integer>> collector) throws Exception {
+                String[] split = s.split("\\W+");
+                for (String s1 : split) {
+                    if (s1.length() > 0) {
+                        collector.collect(new Tuple2<>(s1, 1));
+                    }
+                }
+            }
+        }).groupBy(0).sum(1);
         sum.print();
-        executionEnvironment.execute("hahah");
+        executionEnvironment.execute("hello wordcount");
+
     }
 
-}
-class Tup{
-    private int id;
-    private int score;
-
-    public Tup(int id, int score) {
-        this.id = id;
-        this.score = score;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public int getScore() {
-        return score;
-    }
-
-    public void setScore(int score) {
-        this.score = score;
-    }
 }
