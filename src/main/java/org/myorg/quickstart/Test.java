@@ -17,12 +17,12 @@ public class Test {
                 String[] split = s.split("\\W+");
                 for (String s1 : split) {
                     if (s1.length() > 0) {
-                        collector.collect(new Tuple2<>(s1, 1));
+                        collector.collect(new Tuple2<String, Integer>(s1, 1));
                     }
                 }
             }
         }).groupBy(0).sum(1);
-        sum.print();
+        sum.writeAsCsv("/res.txt");
         executionEnvironment.execute("hello wordcount");
 
     }
